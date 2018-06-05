@@ -1,0 +1,103 @@
+1.flask-restful
+    1)rest是一种设计规范，为了适应前后端分离（移动端与服务端分离）的
+    情况，让请求的数据最小化，最优化。
+    提供了资源（Resource）,uri(统一资源标识符)和动作等概念
+
+
+    2)在服务端（flask项目）提供了apis.py声明Resource的操作
+    class UserResource(Resource):
+        #from flask_restful import Resource
+
+        #声明相关的动作(get,post,put,delete,patch)
+        def get(self):
+            return{}
+
+    3)为资源添加一个uri
+    api=Api(app)  #from flask_restful import Api
+    api.add_rrsource(UserResource,'/user/')
+
+    4)定制输入和输出
+      定制输入
+      #from flak_restful import reqparse
+
+      parser=reqpaarse.RequestParser()
+      #添加输入（请求）参数的说明
+      parser.add_argument('参数名',
+                type=int/str,
+                required=True/Flase,
+                help='验证失败的消息',
+                location='参数来源(args,form.files,cookies)')
+      #在动作处理函数中，通过parse_args()函数来验证请求参数是否
+      def get(self):
+          self.parser.parse_args() #不满足，自动中断请求
+
+          #满足参数条件，业务的实现
+          return {}
+
+      #定制输出参数
+      #from flask_restful import marshal_with,fields
+
+      1)@marshal_with(filds)  #声明输出字段
+        def get(self):
+            data={'msg':'','data':users}  #user=[<class User>,<class User>]
+            return data
+
+      2)marshal(data,fields)
+        def get(self):
+            data={'msg':'','data':user}
+            return marshal(data,self.out_fields)
+    5)文件上传
+     前端的核心代码：
+        function upload(file){
+            var formdata=new FormData() #默认为multipart/form-data
+            formdata.append('参数名',file)
+            $.ajax('/upload/',{
+                type:'post',
+                'data':formdata,
+                contentType:false,  //对上传的数据不做认识编码处理
+                processData:false,  //同上不做任何
+                dataType:'json',
+                success:function(data){
+                    //数据，文件上传成功后的回调函数
+                }
+            })；
+        }
+    后端：
+        class UploadApi(Resource):
+            parser=reqpase.RequestParser()
+
+            #from werkzeug.datastuctures import FileStorage
+            parser.add_argument('img',type=FileStorage,location='files')
+            def post(self)：
+                urgs=self.parser.perse_args()
+                uFile=args.get('img')
+                #将上传的文件保存到服务器指定文件的目录中
+                uFile.save('/users/apple/uploads/'+uFile.filename)
+
+                return {}
+    扩展：
+        在seetings.py文件中，设计BASE_DIR,ATATIC_DIR
+         1)获取settings.py文件的绝对路径
+            abspath=os.path.abspath(__name__)
+         2)获取settings.py所在目录
+            base_dir=os.path.dirname(abspath)
+         3)获取settings.py所在目录的static目录
+            static_dir=os.path.join(base_dir,'static')
+         4)相对于settings.py所在目录的static目录中的uoloads位置
+            media_dir=os.path.join(static_dir,'uploads')
+
+ 2.pycharm 中使用git 工具将项目提交到github上
+ 1)本地安装git工具
+    ubuntu: sudo pip install git
+    widow: https://git-scm.com/download/win
+ 2)在github上注册帐号
+
+ 3)打开pycharm工具，设置git命令的位置和github帐号
+    (window/ubuntu)ctrl+alt+s: 打开设置页面（File->settings）
+    在Version Control:
+        git:git命令所在的位置
+        注意：widow环境,需要将git命令所在的位置配置
+        github:输入帐号和密码
+
+ 4)在github创建一个仓库
+    将仓库的位置：http://sss/  复制
